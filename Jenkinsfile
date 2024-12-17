@@ -39,26 +39,26 @@ pipeline {
             }
         }
 
-        stage('Deploy to Server') {
+       stage('Deploy to Server') {
             steps {
                 script {
-                    echo "Deploying Application on Server"
-                    sh """
-                        ssh ${SERVER_USER}@${SERVER_HOST} "
-                            echo 'Stopping and removing existing container...'
-                            docker stop react-app-container || true
-                            docker rm react-app-container || true
+                echo "Deploying Application on Server"
+                sh """
+                    ssh -o StrictHostKeyChecking=no root@192.168.136.134 << 'EOF'
+                    echo 'Stopping and removing existing container...'
+                    docker stop react-app-container || true
+                    docker rm react-app-container || true
 
-                            echo 'Pulling latest image...'
-                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    echo 'Pulling latest image...'
+                    docker pull mynameaom/test_deploy:latest
 
-                            echo 'Running new container...'
-                            docker run -d --name react-app-container -p 80:80 ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    echo 'Running new container...'
+                    docker run -d --name react-app-container -p 80:80 mynameaom/test_deploy:latest
 
-                            echo 'Removing unused images...'
-                            docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
-                        "
-                    """
+                    echo 'Removing unused images...'
+                    docker rmi mynameaom/test_deploy:latest || true
+                    EOF
+                """
                 }
             }
         }
