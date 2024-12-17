@@ -42,26 +42,24 @@ pipeline {
             }
         }
 
-        stages {
-            stage('Deploy to Server') {
-                steps {
-                    script {
-                        echo "Deploying Application on Server"
-                        withCredentials([file(credentialsId: SSH_CREDENTIALS_ID, variable: 'SSH_PRIVATE_KEY')]) {
-                            sh '''
-                                chmod 600 $SSH_PRIVATE_KEY
-                                ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST \
-                                'echo "Stopping and removing existing container..."; \
-                                docker stop react-app-container || true; \
-                                docker rm react-app-container || true; \
-                                echo "Pulling latest image..."; \
-                                docker pull $DOCKER_IMAGE:$DOCKER_TAG; \
-                                echo "Running new container..."; \
-                                docker run -d --name react-app-container -p 80:80 $DOCKER_IMAGE:$DOCKER_TAG; \
-                                echo "Removing unused images..."; \
-                                docker rmi $DOCKER_IMAGE:$DOCKER_TAG || true'
-                            '''
-                        }
+        stage('Deploy to Server') {
+            steps {
+                script {
+                    echo "Deploying Application on Server"
+                    withCredentials([file(credentialsId: SSH_CREDENTIALS_ID, variable: 'SSH_PRIVATE_KEY')]) {
+                        sh '''
+                            chmod 600 $SSH_PRIVATE_KEY
+                            ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST \
+                            'echo "Stopping and removing existing container..."; \
+                            docker stop react-app-container || true; \
+                            docker rm react-app-container || true; \
+                            echo "Pulling latest image..."; \
+                            docker pull $DOCKER_IMAGE:$DOCKER_TAG; \
+                            echo "Running new container..."; \
+                            docker run -d --name react-app-container -p 80:80 $DOCKER_IMAGE:$DOCKER_TAG; \
+                            echo "Removing unused images..."; \
+                            docker rmi $DOCKER_IMAGE:$DOCKER_TAG || true'
+                        '''
                     }
                 }
             }
