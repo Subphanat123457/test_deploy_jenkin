@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker Image"
-                    sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                 }
             }
         }
@@ -33,10 +33,10 @@ pipeline {
                 script {
                     echo "Pushing Docker Image to Docker Hub"
                     withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh '''
-                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-                            docker push $DOCKER_IMAGE:$DOCKER_TAG
-                        '''
+                        sh """
+                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USER} --password-stdin
+                            docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        """
                     }
                 }
             }
@@ -46,20 +46,24 @@ pipeline {
             steps {
                 script {
                     echo "Deploying Application on Server"
-                    withCredentials([file(credentialsId: SSH_CREDENTIALS_ID, variable: 'SSH_PRIVATE_KEY')]) {
-                        sh '''
-                            chmod 600 $SSH_PRIVATE_KEY
-                            ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST \
-                            'echo "Stopping and removing existing container..."; \
-                            docker stop react-app-container || true; \
-                            docker rm react-app-container || true; \
-                            echo "Pulling latest image..."; \
-                            docker pull $DOCKER_IMAGE:$DOCKER_TAG; \
-                            echo "Running new container..."; \
-                            docker run -d --name react-app-container -p 80:80 $DOCKER_IMAGE:$DOCKER_TAG; \
-                            echo "Removing unused images..."; \
-                            docker rmi $DOCKER_IMAGE:$DOCKER_TAG || true'
-                        '''
+                    withCredentials([usernamePassword(credentialsId: SSH_CREDENTIALS_ID, usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASSWORD')]) {
+                        // ใช้ sshpass เพื่อเข้าสู่ server และรันคำสั่ง
+                        sh """
+                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} <<'EOF'
+                            echo 'Stopping and removing existing container...'
+                            docker stop react-app-container || true
+                            docker rm react-app-container || true
+
+                            echo 'Pulling latest image...'
+                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}
+
+                            echo 'Running new container...'
+                            docker run -d --name react-app-container -p 80:80 ${DOCKER_IMAGE}:${DOCKER_TAG}
+
+                            echo 'Removing unused images...'
+                            docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
+                            EOF
+                        """
                     }
                 }
             }
