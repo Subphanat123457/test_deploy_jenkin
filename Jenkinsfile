@@ -47,22 +47,17 @@ pipeline {
                 script {
                     echo "Deploying Application on Server"
                     withCredentials([usernamePassword(credentialsId: SSH_CREDENTIALS_ID, usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASSWORD')]) {
-                        // ใช้ sshpass เพื่อเข้าสู่ server และรันคำสั่ง
                         sh """
-                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} <<'EOF'
-                            echo 'Stopping and removing existing container...'
-                            docker stop react-app-container || true
-                            docker rm react-app-container || true
-
-                            echo 'Pulling latest image...'
-                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}
-
-                            echo 'Running new container...'
-                            docker run -d --name react-app-container -p 80:80 ${DOCKER_IMAGE}:${DOCKER_TAG}
-
-                            echo 'Removing unused images...'
-                            docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
-                            EOF
+                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} \
+                            'echo "Stopping and removing existing container..."; \
+                            docker stop react-app-container || true; \
+                            docker rm react-app-container || true; \
+                            echo "Pulling latest image..."; \
+                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}; \
+                            echo "Running new container..."; \
+                            docker run -d --name react-app-container -p 80:80 ${DOCKER_IMAGE}:${DOCKER_TAG}; \
+                            echo "Removing unused images..."; \
+                            docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true'
                         """
                     }
                 }
