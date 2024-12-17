@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'mynameaom/test_deploy'  // ชื่อ image บน Docker Hub
         DOCKER_TAG = 'latest'
         DOCKER_HUB_USER = 'mynameaom'  // Username ของ Docker Hub
-        DOCKER_HUB_PASSWORD = credentials('c8ad2cd2-59b2-4f96-8980-162d28142755') // Credentials ID ใน Jenkins
+        DOCKER_HUB_PASSWORD = '17102545_Aom' // Credentials ID ใน Jenkins
         SERVER_USER = 'superadmin'
         SERVER_HOST = '192.168.136.134'
     }
