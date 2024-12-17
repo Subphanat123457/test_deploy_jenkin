@@ -46,9 +46,9 @@ pipeline {
             steps {
                 script {
                     echo "Deploying Application on Server"
-                    withCredentials([usernamePassword(credentialsId: SSH_CREDENTIALS_ID, usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASSWORD')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         sh """
-                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} << 'EOF'
+                            ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${SERVER_HOST} << 'EOF'
                             echo 'Stopping and removing existing container...'
                             docker stop react-app-container || true
                             docker rm react-app-container || true
