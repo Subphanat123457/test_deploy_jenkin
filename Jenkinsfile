@@ -48,20 +48,16 @@ pipeline {
                     echo "Deploying Application on Server"
                     withCredentials([usernamePassword(credentialsId: SSH_CREDENTIALS_ID, usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASSWORD')]) {
                         sh """
-                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} << 'ENDSSH'
-                            echo 'Stopping and removing existing container...'
-                            docker stop react-app-container || true
-                            docker rm react-app-container || true
-
-                            echo 'Pulling latest image...'
-                            docker pull mynameaom/test_deploy:latest
-
-                            echo 'Running new container...'
-                            docker run -d --name react-app-container -p 80:80 mynameaom/test_deploy:latest
-
-                            echo 'Removing unused images...'
-                            docker rmi mynameaom/test_deploy:latest || true
-                            ENDSSH
+                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} \
+                            "echo 'Stopping and removing existing container...'; \
+                            docker stop react-app-container || true; \
+                            docker rm react-app-container || true; \
+                            echo 'Pulling latest image...'; \
+                            docker pull mynameaom/test_deploy:latest; \
+                            echo 'Running new container...'; \
+                            docker run -d --name react-app-container -p 80:80 mynameaom/test_deploy:latest; \
+                            echo 'Removing unused images...'; \
+                            docker rmi mynameaom/test_deploy:latest || true"
                         """
                     }
                 }
