@@ -6,7 +6,7 @@ pipeline {
         DOCKER_TAG = 'latest'
         DOCKER_HUB_USER = 'mynameaom'  // Username ของ Docker Hub
         DOCKER_HUB_PASSWORD = '17102545_Aom' // Credentials ID ใน Jenkins
-        SERVER_USER = 'superadmin'
+        SERVER_USER = 'root'
         SERVER_HOST = '192.168.136.134'
     }
 
