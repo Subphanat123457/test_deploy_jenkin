@@ -42,7 +42,7 @@ pipeline {
             }
         }
 
-       stage('Deploy to Server') {
+        stage('Deploy to Server') {
             steps {
                 script {
                     echo "Deploying Application on Server"
