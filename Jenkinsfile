@@ -42,13 +42,13 @@ pipeline {
             }
         }
 
-        stage('Deploy to Server') {
+       stage('Deploy to Server') {
             steps {
                 script {
                     echo "Deploying Application on Server"
                     withCredentials([usernamePassword(credentialsId: SSH_CREDENTIALS_ID, usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASSWORD')]) {
                         sh """
-                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} << 'EOF'
+                            sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_HOST} << 'ENDSSH'
                             echo 'Stopping and removing existing container...'
                             docker stop react-app-container || true
                             docker rm react-app-container || true
@@ -61,7 +61,7 @@ pipeline {
 
                             echo 'Removing unused images...'
                             docker rmi mynameaom/test_deploy:latest || true
-                            EOF
+                            ENDSSH
                         """
                     }
                 }
